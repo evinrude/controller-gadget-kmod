@@ -1,0 +1,25 @@
+USB Controller Gadget kmod
+Copyright (C) 2012 Mickey Malone     <mickey.malone at gmail.com>
+ 
+This is a kernel driver intended for a usb device that has 2 interrupt
+endpoints, in and out. In my case it is a usb device that controls my
+6 sprinkler zones. It creates a character device that udev should 
+create for you. If it does not, then you can create it manually. The 
+major number is whatever is listed at usb_device under /proc/devices
+and the minor is set in the module (31).
+ 
+Influenced by the Dream Cheeky USB missile launcher
+Copyright (C) 2007 Matthias Vallentin <vallentin@icsi.berkeley.edu>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. 
