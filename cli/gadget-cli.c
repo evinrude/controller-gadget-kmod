@@ -38,7 +38,7 @@ int main()
 	
 	for(;;)
 	{
-			printf("sc> ");
+			printf("gadget> ");
 			scanf("%s",input);
 			
 			switch(input[0])

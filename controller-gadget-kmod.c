@@ -42,49 +42,49 @@
 /**
 * Static constants
 **/
-#define VENDOR_ID  				0x04d8
-#define PRODUCT_ID  			0x0042
-#define TIMEOUT_MS  			5000
-#define STATUS 					0x09
-#define ASCII_STATUS 			0x53
+#define VENDOR_ID  						0x04d8
+#define PRODUCT_ID  						0x0042
+#define TIMEOUT_MS  						5000
+#define STATUS								0x09
+#define ASCII_STATUS 					0x53
 
-#define STATUS_OFF 				0x00
-#define OFF 					0x10
-#define ASCII_OFF				0x30
-#define MESSAGE_OFF				"0"
+#define STATUS_OFF 						0x00
+#define OFF 								0x10
+#define ASCII_OFF							0x30
+#define MESSAGE_OFF						"0"
 
-#define STATUS_SPRINKLER_ZONE1 	0x01
-#define SPRINKLER_ZONE1 		0x11
-#define ASCII_SPRINKLER_ZONE1 	0x31
-#define MESSAGE_ZONE1			"1"
+#define STATUS_SPRINKLER_ZONE1		0x01
+#define SPRINKLER_ZONE1 				0x11
+#define ASCII_SPRINKLER_ZONE1 		0x31
+#define MESSAGE_ZONE1					"1"
  
-#define STATUS_SPRINKLER_ZONE2 	0x02 
-#define SPRINKLER_ZONE2 		0x12
-#define	ASCII_SPRINKLER_ZONE2 	0x32
-#define MESSAGE_ZONE2			"2"
+#define STATUS_SPRINKLER_ZONE2 		0x02 
+#define SPRINKLER_ZONE2 				0x12
+#define	ASCII_SPRINKLER_ZONE2 		0x32
+#define MESSAGE_ZONE2					"2"
 
-#define STATUS_SPRINKLER_ZONE3 	0x04
-#define SPRINKLER_ZONE3 		0x13
-#define	ASCII_SPRINKLER_ZONE3 	0x33
-#define MESSAGE_ZONE3			"3"
+#define STATUS_SPRINKLER_ZONE3 		0x04
+#define SPRINKLER_ZONE3 				0x13
+#define	ASCII_SPRINKLER_ZONE3 		0x33
+#define MESSAGE_ZONE3					"3"
 
-#define STATUS_SPRINKLER_ZONE4 	0x08
-#define SPRINKLER_ZONE4 		0x14
-#define	ASCII_SPRINKLER_ZONE4 	0x34
-#define MESSAGE_ZONE4			"4"
+#define STATUS_SPRINKLER_ZONE4 		0x08
+#define SPRINKLER_ZONE4 				0x14
+#define	ASCII_SPRINKLER_ZONE4 		0x34
+#define MESSAGE_ZONE4					"4"
 
-#define STATUS_SPRINKLER_ZONE5 	0x10
-#define SPRINKLER_ZONE5 		0x15
-#define	ASCII_SPRINKLER_ZONE5 	0x35
-#define MESSAGE_ZONE5			"5"
+#define STATUS_SPRINKLER_ZONE5 		0x10
+#define SPRINKLER_ZONE5 				0x15
+#define	ASCII_SPRINKLER_ZONE5 		0x35
+#define MESSAGE_ZONE5					"5"
 
-#define STATUS_SPRINKLER_ZONE6 	0x20
-#define SPRINKLER_ZONE6 		0x16
-#define	ASCII_SPRINKLER_ZONE6 	0x36
-#define MESSAGE_ZONE6			"6"
+#define STATUS_SPRINKLER_ZONE6 		0x20
+#define SPRINKLER_ZONE6 				0x16
+#define	ASCII_SPRINKLER_ZONE6 		0x36
+#define MESSAGE_ZONE6					"6"
 
 
-#define SC_MINOR_BASE			31		
+#define SC_MINOR_BASE					31		
 
 /** 
  * Helper macros 
@@ -117,21 +117,21 @@ static ssize_t sc_read(struct file *file, char __user *user, size_t count, loff_
  * The main data structure used throuough this module
 **/
 struct usb_sc {
-	struct usb_device 				*udev;
+	struct usb_device 					*udev;
 	struct usb_interface 				*interface;
-	int									timeout;
-	char								status;
-	struct 							semaphore sem;
+	int										timeout;
+	char										status;
+	struct 									semaphore sem;
 	
 	//Interrupt endpoint used for status
-	char 								*int_in_buffer;
+	char 										*int_in_buffer;
 	struct usb_endpoint_descriptor 	*int_in_endpoint;
-	struct urb 						*int_in_urb;
+	struct urb 								*int_in_urb;
 
 	//Interrupt endpoint used for sending commands
-	char 								*int_out_buffer;
+	char 										*int_out_buffer;
 	struct usb_endpoint_descriptor 	*int_out_endpoint;
-	struct urb 						*int_out_urb;
+	struct urb 								*int_out_urb;
 };
 
 /** 
@@ -146,9 +146,9 @@ static struct usb_device_id sc_table [] = {
  * USB driver data structure 
 **/
 static struct usb_driver sc_driver = {
-	.name = "gadget",
-	.id_table = sc_table,
-	.probe = sc_probe,
+	.name 		= "gadget",
+	.id_table 	= sc_table,
+	.probe 		= sc_probe,
 	.disconnect = sc_disconnect,
 };
 
@@ -157,19 +157,19 @@ static struct usb_driver sc_driver = {
  * that will be implemented in this module 
 **/
 static struct file_operations sc_fops = {
-	.owner =	THIS_MODULE,
-	.open =		sc_open,
-	.write =	sc_write,
-	.read =		sc_read,
-	.release =	sc_release,
+	.owner 		=	THIS_MODULE,
+	.open 		=	sc_open,
+	.write 		=	sc_write,
+	.read 		=	sc_read,
+	.release 	=	sc_release,
 };
 
 /** 
  * USB class data structure 
 **/
 static struct usb_class_driver sc_class = {
-	.name = "gadget",
-	.fops = &sc_fops,
+	.name 		= "gadget",
+	.fops 		= &sc_fops,
 	.minor_base = SC_MINOR_BASE,
 };
 
@@ -193,7 +193,7 @@ static ssize_t sc_read(struct file *file, char __user *user, size_t count, loff_
 	struct usb_sc *dev;
 	struct usb_interface *interface;
 	char *message;
-	int retval = 0;
+	int retval 	= 0;
 	
 	LOGGER_DEBUG("Inside of sc_read");
 	
@@ -279,6 +279,7 @@ static ssize_t sc_read(struct file *file, char __user *user, size_t count, loff_
 			return 0;
 		}
 }
+
 /** 
  * File ops:write 
  * This method carries out writing to the usb interrupt out endpoint
