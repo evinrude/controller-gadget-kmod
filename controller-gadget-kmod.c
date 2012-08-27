@@ -186,7 +186,7 @@ static void sc_int_in_callback(struct urb *urb)
 
 /**
  * File ops:read
- * This method returns the sprinkler status contained in the dev->int_in_buffer[0]
+ * This method returns the gadget status contained in the dev->int_in_buffer[0]
  **/
 static ssize_t sc_read(struct file *file, char __user *user, size_t count, loff_t *ppos)
 {
@@ -633,7 +633,7 @@ static void sc_disconnect(struct usb_interface *interface)
 	kfree(dev->int_out_buffer);
 	kfree(dev);
 
-	LOGGER_INFO("USB sprinkler controller now disconnected\n");
+	LOGGER_INFO("USB gadget controller now disconnected\n");
 }
 
 /**
