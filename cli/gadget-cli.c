@@ -21,53 +21,96 @@
  **/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
+#include <errno.h>
+
+#define GADGET "/dev/gadget"
+
+void werror(void)
+{
+	perror("Write failed\n");
+        exit(errno);
+}
 
 int main()
 {
 	int fd=0;
-	char input[2];
+	char input[32768];
 	char buff[80]="";
+
 	
-	
-	fd=open("/dev/gadget",O_RDWR);
+	fd=open(GADGET,O_RDWR);
+	if(fd <= 0)
+	{
+		perror("Unable to open device\n");
+		exit(errno);
+	}
 	
 	for(;;)
 	{
 			printf("gadget> ");
-			scanf("%s",input);
-			
+			if(scanf("%s",input) == 0)
+			{
+				perror("Unable to get input\n");
+				exit(errno);
+			}
+
 			switch(input[0])
 			{
 				case '0':
-					write(fd,"0",1);
+					if(write(fd,"0",1) == -1)
+					{
+						werror();
+					}
 					break;
 				case '1':
-					write(fd,"1",1);
+					if(write(fd,"1",1) == -1)
+					{
+						werror();
+					}
 					break;
 				case '2':
-					write(fd,"2",1);
+					if(write(fd,"2",1) == -1)
+					{
+						werror();
+					}
 					break;
 				case '3':
-					write(fd,"3",1);
+					if(write(fd,"3",1) == -1)
+					{
+						werror();
+					}
 					break;
 				case '4':
-					write(fd,"4",1);
+					if(write(fd,"4",1) == -1)
+					{
+						werror();
+					}
 					break;
 				case '5':
-					write(fd,"5",1);
+					if(write(fd,"5",1) == -1)
+					{
+						werror();
+					}
 					break;
 				case '6':
-					write(fd,"6",1);
+					if(write(fd,"6",1) == -1)
+					{
+						werror();
+					}
 					break;
 				case 'q':
 					goto quit;
 				case 's':
-					write(fd,"S",1);
+					if(write(fd,"S",1) == -1)
+					{
+						werror();
+					}
 					while((read(fd,buff,10)) == 0)
 					{
 						usleep(500);
@@ -75,6 +118,8 @@ int main()
 					printf("Status [%c]\n", buff[0]);
 					break;
 				default:
+					printf("Unrecognized command [%c]. ",input[0]);
+					printf("Expected commands are 0, 1, 2, 3, 4, 5, 6, s, q\n");
 					continue;
 			}
 	}
