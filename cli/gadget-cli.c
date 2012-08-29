@@ -1,10 +1,10 @@
 /**
- * 
+ *
  * USB Controller Gadget CLI
  * Copyright (C) 2012 Mickey Malone     <mickey.malone at gmail.com>
- * 
+ *
  * This is the CLI to the kernel driver.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -16,8 +16,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. 
- * 
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  **/
 
 #include <stdio.h>
@@ -28,103 +28,94 @@
 #include <fcntl.h>
 #include <string.h>
 #include <errno.h>
+#include <libcontroller-gadget.h>
 
-#define GADGET "/dev/gadget"
 
 void werror(void)
 {
 	perror("Write failed\n");
-        exit(errno);
+	exit(errno);
 }
 
 int main()
 {
-	int fd=0;
 	char input[32768];
-	char buff[80]="";
+	char status;
+	int timeout = 5;
 
-	
-	fd=open(GADGET,O_RDWR);
-	if(fd <= 0)
-	{
-		perror("Unable to open device\n");
-		exit(errno);
-	}
-	
 	for(;;)
 	{
-			printf("gadget> ");
-			if(scanf("%s",input) == 0)
-			{
-				perror("Unable to get input\n");
-				exit(errno);
-			}
+		printf("gadget> ");
+		if(scanf("%s",input) == 0)
+		{
+			perror("Unable to get input\n");
+			exit(errno);
+		}
 
-			switch(input[0])
+		switch(input[0])
+		{
+		case '0':
+			if(gadgetwrite((unsigned char) 0x10) == -1)
 			{
-				case '0':
-					if(write(fd,"0",1) == -1)
-					{
-						werror();
-					}
-					break;
-				case '1':
-					if(write(fd,"1",1) == -1)
-					{
-						werror();
-					}
-					break;
-				case '2':
-					if(write(fd,"2",1) == -1)
-					{
-						werror();
-					}
-					break;
-				case '3':
-					if(write(fd,"3",1) == -1)
-					{
-						werror();
-					}
-					break;
-				case '4':
-					if(write(fd,"4",1) == -1)
-					{
-						werror();
-					}
-					break;
-				case '5':
-					if(write(fd,"5",1) == -1)
-					{
-						werror();
-					}
-					break;
-				case '6':
-					if(write(fd,"6",1) == -1)
-					{
-						werror();
-					}
-					break;
-				case 'q':
-					goto quit;
-				case 's':
-					if(write(fd,"S",1) == -1)
-					{
-						werror();
-					}
-					while((read(fd,buff,10)) == 0)
-					{
-						usleep(500);
-					}
-					printf("Status [%c]\n", buff[0]);
-					break;
-				default:
-					printf("Unrecognized command [%c]. ",input[0]);
-					printf("Expected commands are 0, 1, 2, 3, 4, 5, 6, s, q\n");
-					continue;
+				werror();
 			}
+			break;
+		case '1':
+			if(gadgetwrite((unsigned char) 0x11) == -1)
+			{
+				werror();
+			}
+			break;
+		case '2':
+			if(gadgetwrite((unsigned char) 0x12) == -1)
+			{
+				werror();
+			}
+			break;
+		case '3':
+			if(gadgetwrite((unsigned char) 0x13) == -1)
+			{
+				werror();
+			}
+			break;
+		case '4':
+			if(gadgetwrite((unsigned char) 0x14) == -1)
+			{
+				werror();
+			}
+			break;
+		case '5':
+			if(gadgetwrite((unsigned char) 0x15) == -1)
+			{
+				werror();
+			}
+			break;
+		case '6':
+			if(gadgetwrite((unsigned char) 0x16) == -1)
+			{
+				werror();
+			}
+			break;
+		case 'q':
+			goto quit;
+		case 's':
+			status = gadgetstatus(timeout);
+			if(status == ERROR_CODE)
+			{
+				perror("Status: ERROR");
+			}
+			else
+			{
+				printf("Status: %c\n",status);
+			}
+			break;
+		default:
+			printf("Unrecognized command [%c]. ",input[0]);
+			printf("Expected commands are 0, 1, 2, 3, 4, 5, 6, s, q\n");
+			continue;
+		}
 	}
-	
+
 quit:
-	close(fd);
-	return 0;	
+	return 0;
 }

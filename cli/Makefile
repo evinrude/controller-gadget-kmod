@@ -1,11 +1,12 @@
-CFLAGS = -O2 -Wall -pedantic
+CFLAGS = -O2 -Wall -pedantic -L ../lib
+LIBS = -lcontroller-gadget
 
 default: all
 
-all: clean
+all:
 	@echo "  CC $$(pwd)/gadget-cli.c"
-	@$(CC) $(CFLAGS) -o gadget-cli gadget-cli.c
+	@export LD_LIBRARY_PATH=/home/mickey/Development/c-programming/controller-gadget-kmod/lib && $(CC) $(CFLAGS) -o gadget-cli gadget-cli.c $(LIBS)
 
 clean:
 	@echo "  CLEAN $$(pwd)"
-	@rm -f gadget-cli
+	@rm -vf gadget-cli
