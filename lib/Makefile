@@ -19,8 +19,8 @@ all:
 
 install:
 	@cp -v $(LIB_NAME).$(LIB_VERSION).0 $(LIB_DIR)/
-	@cp -v $(LIB_NAME) $(LIB_DIR)
-	@cp -v $(LIB_NAME).$(LIB_VERSION) $(LIB_DIR)
+	@ln -s $(LIB_DIR)/$(LIB_NAME).$(LIB_VERSION).0 $(LIB_DIR)/$(LIB_NAME)
+	@ln -s $(LIB_DIR)/$(LIB_NAME).$(LIB_VERSION).0 $(LIB_DIR)/$(LIB_NAME).$(LIB_VERSION)
 	@cp -v $(HEADERS) /usr/include/
 
 uninstall:
