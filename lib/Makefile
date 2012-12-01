@@ -18,10 +18,10 @@ all:
 	@ln -s $(LIB_NAME).$(LIB_VERSION).0 $(LIB_NAME).$(LIB_VERSION)
 
 install:
-	@cp -v $(LIB_NAME).$(LIB_VERSION).0 $(LIB_DIR)/
-	@ln -s $(LIB_DIR)/$(LIB_NAME).$(LIB_VERSION).0 $(LIB_DIR)/$(LIB_NAME)
-	@ln -s $(LIB_DIR)/$(LIB_NAME).$(LIB_VERSION).0 $(LIB_DIR)/$(LIB_NAME).$(LIB_VERSION)
-	@cp -v $(HEADERS) /usr/include/
+	@cp -fv $(LIB_NAME).$(LIB_VERSION).0 $(LIB_DIR)/
+	@ln -fs $(LIB_DIR)/$(LIB_NAME).$(LIB_VERSION).0 $(LIB_DIR)/$(LIB_NAME)
+	@ln -fs $(LIB_DIR)/$(LIB_NAME).$(LIB_VERSION).0 $(LIB_DIR)/$(LIB_NAME).$(LIB_VERSION)
+	@cp -fv $(HEADERS) /usr/include/
 
 uninstall:
 	@rm -fv $(LIB_DIR)/$(LIB_NAME)*

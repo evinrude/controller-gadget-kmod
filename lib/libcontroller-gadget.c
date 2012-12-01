@@ -43,7 +43,7 @@ int gadgetwrite(unsigned char byte)
 	if(fd <= 0)
 	{
 		errno = EINVAL;
-		return ERROR_CODE;
+		return -1;
 	}
 
 	if(write(fd,(char*) &byte,1) != 1)
@@ -60,28 +60,28 @@ int gadgetwrite(unsigned char byte)
  * returns the status on success and 0xFF on failure
  * check errno on failure
  */
-unsigned char gadgetstatus(int timeout)
+int gadgetstatus(int timeout, unsigned char *status)
 {
 	char temp = STATUS_CODE;
-	char buff[2];
+	unsigned char buff[2];
 	float current_wait = 0.0;
 
 	if(timeout == 0)
 	{
 		errno = EINVAL;
-		return ERROR_CODE;
+		return -1;
 	}
 
 	if(fd <= 0)
 	{
 		errno = ENODEV;
-		return ERROR_CODE;
+		return -1;
 	}
 
 	if(write(fd,(char*) &temp,1) != 1)
 	{
 		//write sets errno
-		return ERROR_CODE;
+		return -1;
 	}
 
 	while((read(fd,buff,2)) == 0)
@@ -91,11 +91,18 @@ unsigned char gadgetstatus(int timeout)
 		if((current_wait / 2) == timeout)
 		{
 			errno = ETIME;
-			return ERROR_CODE;
+			return -1;
 		}
 	}
 
-	return buff[0];
+	*status = buff[0];
+	return 0;
+}
+
+void gadgetrefresh(void)
+{
+	__gadgetdestroy();
+	__gadgetinit();
 }
 
 void __gadgetinit(void)

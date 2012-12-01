@@ -40,7 +40,7 @@ void werror(void)
 int main()
 {
 	char input[32768];
-	char status;
+	unsigned char status;
 	int timeout = 5;
 
 	for(;;)
@@ -98,11 +98,14 @@ int main()
 			break;
 		case 'q':
 			goto quit;
+		case 'r':
+			gadgetrefresh();
+			break;
 		case 's':
-			status = gadgetstatus(timeout);
-			if(status == ERROR_CODE)
+			if(gadgetstatus(timeout, &status) == -1)
 			{
 				perror("Status: ERROR");
+				exit(errno);
 			}
 			else
 			{

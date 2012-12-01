@@ -23,7 +23,6 @@
 
 #define GADGET              "/dev/gadget"
 #define STATUS_CODE         0x09
-#define ERROR_CODE          0xFF
 
 /*  
  * write a byte to the gadget
@@ -37,4 +36,11 @@ extern int gadgetwrite(unsigned char byte);
  * returns the status on success and 0xFF on failure
  * check errno on failure
  */
-extern unsigned char gadgetstatus(int timeout);
+extern int gadgetstatus(int timeout, unsigned char *status);
+
+/*  
+ * Calls the destructor and contructor in that order.
+ * This can be used as a desperate attempt to refresh the 
+ * /dev/gadget file handle
+ */
+extern void gadgetrefresh(void);

@@ -98,7 +98,8 @@ static int debug = 0;
 module_param(debug, int, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
 MODULE_PARM_DESC(debug, "Set the log level to debug");
 
-static int have_data;
+static int GLOBAL_havedata;
+static int GLOBAL_open;
 
 /**
  * Prototype Functions
@@ -167,7 +168,7 @@ static struct file_operations sc_fops = {
 /**
  * USB class data structure
  **/
-static struct usb_class_driver sc_class = {
+ struct usb_class_driver sc_class = {
 	.name           = "gadget",
 	.fops           = &sc_fops,
 	.minor_base     = SC_MINOR_BASE,
@@ -181,7 +182,7 @@ static void sc_int_in_callback(struct urb *urb)
 {
 	struct usb_sc *dev = urb->context;
 	LOGGER_DEBUG("Interrupt In [0x%X]\n", dev->int_in_buffer[0]);
-	have_data = 1;
+	GLOBAL_havedata = 1;
 }
 
 /**
@@ -191,30 +192,29 @@ static void sc_int_in_callback(struct urb *urb)
 static ssize_t sc_read(struct file *file, char __user *user, size_t count, loff_t *ppos)
 {
 	struct usb_sc        *dev;
-	struct usb_interface *interface;
 	char                 *message;
 	int                  retval = 0;
 
 	LOGGER_DEBUG("Inside of sc_read");
+        dev = file->private_data;
+	if (!dev)
+        {
+		LOGGER_ERR("Missing usb_sc structure, cannot continue");
+		retval = -ENODEV;
+		goto nounlock;
+	}
 
-	if(!have_data)
+	if(!GLOBAL_open)
+	{
+		LOGGER_ERR("Illegal operation. An `open` operation is required to process a `read` operation.");
+		retval = -EIO;
+                goto nounlock;
+	}
+
+	if(!GLOBAL_havedata)
 	{
 		LOGGER_DEBUG("No data to be read from the interrupt in endpoint");
-		goto nounlock;
-	}
-
-	interface = usb_find_interface(&sc_driver, SC_MINOR_BASE);
-	if (!interface)
-	{
-		//now we are really in trouble
-		LOGGER_ERR("HELP ME: unable to locate the usb interface through usb_find_interface");
-		goto nounlock;
-	}
-
-	dev = usb_get_intfdata(interface);
-	if (!dev)
-	{
-		LOGGER_ERR("HELP ME: found the interface, but unable to retrieve the saved usb_sc data structure");
+		retval = 0;
 		goto nounlock;
 	}
 
@@ -267,16 +267,16 @@ static ssize_t sc_read(struct file *file, char __user *user, size_t count, loff_
 exit:
 	up(&dev->sem);
 nounlock:
-	if(have_data)
+	if(GLOBAL_havedata && retval == 0)
 	{
 		//return 1 byte
-		have_data = 0;
+		GLOBAL_havedata = 0;
 		return 1;
 	}
 	else
 	{
-		//retrun nothing
-		return 0;
+		//return nothing
+		return retval;
 	}
 }
 
@@ -290,37 +290,26 @@ nounlock:
 static ssize_t sc_write(struct file *file, const char __user *user_buf, size_t count, loff_t *ppos)
 {
 	struct usb_sc        *dev;
-	struct usb_interface *interface;
 	int                  retval = 0;
 	int                  *actual = 0, i = 0;
 	char                 cmd = '\0';
 
 	LOGGER_DEBUG("Counted [%d] bytes from user land", (int)count);
 
-	//get our main data structure that was saved in sc_open - if it is not available, we will retrieve it by other means
-	dev = file->private_data;
-	if (!dev)
-	{
-		LOGGER_DEBUG("file->private_data data is empty, locating usb_sc by interface");
+        dev = file->private_data;
+        if (!dev)
+        {
+                LOGGER_ERR("Missing usb_sc structure, cannot continue");
+		retval = -ENODEV;
+                goto nounlock;
+        }
 
-		//Other means
-		interface = usb_find_interface(&sc_driver, SC_MINOR_BASE);
-		if (!interface)
-		{
-			//now we are really in trouble
-			LOGGER_ERR("HELP ME: unable to locate the usb interface through usb_find_interface");
-			retval = -ENODEV;
-			goto nounlock;
-		}
-
-		dev = usb_get_intfdata(interface);
-		if (!dev)
-		{
-			LOGGER_ERR("HELP ME: found the interface, but unable to retrieve the saved usb_sc data structure");
-			retval = -ENODEV;
-			goto nounlock;
-		}
-	}
+        if(!GLOBAL_open)
+        {
+                LOGGER_ERR("Illegal operation. An `open` operation is required to process a `write` operation.");
+		retval = -EIO;
+                goto nounlock;
+        }
 
 	down_interruptible(&dev->sem);
 
@@ -418,8 +407,15 @@ static ssize_t sc_write(struct file *file, const char __user *user_buf, size_t c
 exit:
 	up(&dev->sem);
 nounlock:
-	//return the number of bytes submitted from user space - passifier
-	return count;
+	if(retval == 0)
+        {
+		//return the number of bytes submitted from user space - passifier
+		return count;
+	}
+	else
+	{
+		return retval;
+	}
 }
 
 /**
@@ -452,6 +448,7 @@ static int sc_open(struct inode *inode, struct file *file)
 		goto exit;
 	}
 
+	GLOBAL_open = 1;
 	file->private_data = dev;
 
 exit:
@@ -465,7 +462,18 @@ exit:
  **/
 static int sc_release(struct inode *inode, struct file *file)
 {
+	struct usb_sc        *dev;
+
 	LOGGER_DEBUG("Inside sc_release\n");
+
+	/* not sure if there is another way around this. If the device becomes disconnected while a user has
+         * the character device /dev/gadget open, then the next write/read op will fail. This flag is here so
+         * so that the ops fail smoothly.
+         */
+	dev = file->private_data;
+
+	LOGGER_DEBUG("Set the open flag to 0\n");
+	GLOBAL_open = 0;
 	return 0;
 }
 
@@ -484,7 +492,7 @@ static int sc_probe(struct usb_interface *interface, const struct usb_device_id 
 	int                            retval = -ENODEV;
 
 	//initialize the data flag
-	have_data = 0;
+	GLOBAL_havedata = 0;
 
 	// Make sure we have something to work with
 	if (!udev)
@@ -502,6 +510,7 @@ static int sc_probe(struct usb_interface *interface, const struct usb_device_id 
 		goto exit;
 	}
 
+	GLOBAL_open = 0;
 	dev->udev = udev;
 	dev->interface = interface;
 	iface_desc = interface->cur_altsetting;
@@ -616,8 +625,9 @@ static void sc_disconnect(struct usb_interface *interface)
 {
 	struct usb_sc *dev;
 	dev = usb_get_intfdata(interface);
+	GLOBAL_open = 0;
 	
-    usb_set_intfdata(interface, NULL);
+        usb_set_intfdata(interface, NULL);
 	usb_deregister_dev(interface, &sc_class);
 
 	if (dev->int_in_urb)
