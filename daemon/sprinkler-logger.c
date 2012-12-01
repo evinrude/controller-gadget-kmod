@@ -1,10 +1,9 @@
-//
-//  sprinkler-logger.c
-//  sprinklerdaemon
-//
-//  Created by Mickey Malone on 4/6/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
+/**
+ *
+ * USB Controller Gadget Daemon (sprinkler-logger.c)
+ * Copyright (C) 2012 Mickey Malone     <mickey.malone at gmail.com>
+ *
+ */
 
 #include <stdio.h>
 #include <time.h>

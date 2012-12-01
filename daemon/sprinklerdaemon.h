@@ -1,10 +1,9 @@
-//
-//  sprinklerdaemon.h
-//  sprinklerdaemon
-//
-//  Created by Mickey Malone on 4/6/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
-//
+/**
+ *
+ * USB Controller Gadget Daemon (sprinklerdaemon.h)
+ * Copyright (C) 2012 Mickey Malone     <mickey.malone at gmail.com>
+ *
+ */
 
 #ifndef sprinklerdaemon_sprinklerdaemon_h
 #define sprinklerdaemon_sprinklerdaemon_h

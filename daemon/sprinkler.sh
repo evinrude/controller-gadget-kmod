@@ -1,5 +1,8 @@
 #! /bin/sh 
 #
+# USB Controller Gadget Daemon (sprinkler.sh)
+# Copyright (C) 2012 Mickey Malone     <mickey.malone at gmail.com>
+#
 # > update-rc.d sprinkler defaults 60
 #
 sprinkler=${SPRINKLER_BIN:-/sbin/sprinklerdaemon}

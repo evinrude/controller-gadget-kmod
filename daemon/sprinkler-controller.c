@@ -1,9 +1,10 @@
-//
-//  sprinklerusb
-//
-//  Created by Mickey Malone on 3/18/12.
-//
-//
+/**
+ *
+ * USB Controller Gadget Daemon (sprinkler-controller.c)
+ * Copyright (C) 2012 Mickey Malone     <mickey.malone at gmail.com>
+ *
+ */
+
 #include <errno.h>
 #include <string.h>
 #include <stdio.h>
