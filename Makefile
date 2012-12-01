@@ -2,8 +2,8 @@ obj-m += controller-gadget-kmod.o
 
 default: all
 
-.PHONY: lib cli
-all: kernmodule lib cli
+.PHONY: lib cli daemon
+all: kernmodule lib cli daemon
 
 kernmodule:
 	@make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
@@ -14,11 +14,15 @@ lib:
 cli:
 	@make -C cli all
 
+daemon:
+	@make -C daemon all
+
 
 clean:
 	@make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
 	@make -C lib clean
 	@make -C cli clean
+	@make -C daemon clean
 
 install:
 	@echo "  INSMOD controller-gadget-kmod.ko"
