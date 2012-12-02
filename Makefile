@@ -1,4 +1,5 @@
 obj-m += controller-gadget-kmod.o
+UDEV_RULE_PATH = /etc/udev/rules.d
 
 default: all
 
@@ -25,11 +26,19 @@ clean:
 	@make -C daemon clean
 
 install:
-	@echo "  INSMOD controller-gadget-kmod.ko"
-	@insmod controller-gadget-kmod.ko
-	@make -C lib install
+	@echo "  INSTALLING controller-gadget-kmod.ko"
+	cp -vf controller-gadget-kmod.ko /lib/modules/$(shell uname -r)/kernel/drivers/misc/
+	cp -vf 99-controller.rules $(UDEV_RULE_PATH)
+	udevadm control --reload-rules
+	udevadm trigger
+	depmod
+	modprobe controller-gadget-kmod
 
 uninstall:
-	@echo "  RMMOD controller-gadget-kmod.ko"
-	@rmmod controller-gadget-kmod.ko
-	@make -C lib uninstall
+	@echo "  UNINSTALLING controller-gadget-kmod.ko"
+	rm -fv /lib/modules/$(shell uname -r)/kernel/drivers/misc/controller-gadget-kmod.ko
+	rm -fv $(UDEV_RULE_PATH)/99-controller.rules
+	udevadm control --reload-rules
+	udevadm trigger
+	rmmod controller-gadget-kmod.ko
+	depmod
