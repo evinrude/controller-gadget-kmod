@@ -34,12 +34,36 @@ void __gadgetinit(void) __attribute__ ((constructor));
 void __gadgetdestroy(void) __attribute__ ((destructor));
 
 /*
+ * open the gadget from sysfs
+ * sets the fd
+ */
+void gadgetopen()
+{
+	fd = open(GADGET,O_RDWR);
+    if(fd <= 0)
+    {
+        fprintf(stderr,"libcontroller-gadget: Unable to open the gadget [%s]\n", GADGET);
+    }
+}
+
+/*
+ * close the gadget from sysfs
+ * closes the fd
+ */
+void gadgetclose()
+{
+	close(fd);
+}
+
+/*
  * write a byte to the gadget
  * returns 0 on success, returns -1
  * on failure and sets errno
  */
 int gadgetwrite(unsigned char byte)
 {
+	gadgetopen();
+
 	if(fd <= 0)
 	{
 		errno = EINVAL;
@@ -49,9 +73,11 @@ int gadgetwrite(unsigned char byte)
 	if(write(fd,(char*) &byte,1) != 1)
 	{
 		//write sets errno
+		gadgetclose();
 		return -1;
 	}
 
+	gadgetclose();
 	return 0;
 }
 
@@ -72,15 +98,19 @@ int gadgetstatus(int timeout, unsigned char *status)
 		return -1;
 	}
 
+	gadgetopen();
+
 	if(fd <= 0)
 	{
 		errno = ENODEV;
+		gadgetclose();
 		return -1;
 	}
 
 	if(write(fd,(char*) &temp,1) != 1)
 	{
 		//write sets errno
+		gadgetclose();
 		return -1;
 	}
 
@@ -91,31 +121,25 @@ int gadgetstatus(int timeout, unsigned char *status)
 		if((current_wait / 2) == timeout)
 		{
 			errno = ETIME;
+			gadgetclose();
 			return -1;
 		}
 	}
 
 	*status = buff[0];
+	gadgetclose();
 	return 0;
 }
 
 void gadgetrefresh(void)
 {
-	__gadgetdestroy();
-	__gadgetinit();
+	gadgetclose();
+	gadgetopen();
 }
 
-void __gadgetinit(void)
-{
-	fd = open(GADGET,O_RDWR);
-	if(fd <= 0)
-	{
-		fprintf(stderr,"libcontroller-gadget: Unable to open the gadget [%s]\n", GADGET);
-		exit(errno);
-	}
-}
+void __gadgetinit(void);
 
 void __gadgetdestroy(void)
 {
-	close(fd);
+	gadgetclose();
 }
