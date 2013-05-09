@@ -26,7 +26,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-#include <sys/stat.h>
 #include <libcontroller-gadget.h>
 
 static int fd = 0;
@@ -40,21 +39,10 @@ void __gadgetdestroy(void) __attribute__ ((destructor));
  */
 void gadgetopen()
 {
-	struct stat gadgetstatus;
-    stat(GADGET, &gadgetstatus);
-	if(gadgetstatus.st_mode & S_IREAD && gadgetstatus.st_mode & S_IWRITE)
-	{
-		fprintf(stderr, "libcontroller-gadget: You do not have the permissions to open the gadget [%s]: %s\n", GADGET, strerror(errno));
-		fd = -1;
-		errno = EACCES;
-	}
-	else
-	{
-		fd = open(GADGET,O_RDWR);
-    	if(fd <= 0)
-    	{
-        	fprintf(stderr,"libcontroller-gadget: Unable to open the gadget [%s]: %s\n", GADGET, strerror(errno));
-    	}
+	fd = open(GADGET,O_RDWR);
+    if(fd <= 0)
+    {
+		fprintf(stderr,"libcontroller-gadget: Unable to open the gadget [%s]: %s\n", GADGET, strerror(errno));
 	}
 }
 
