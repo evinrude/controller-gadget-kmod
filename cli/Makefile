@@ -1,4 +1,4 @@
-CFLAGS = -O2 -Wall -pedantic -L ../lib
+CFLAGS = -O2 -Wall -pedantic -L ../lib -I../lib
 CDEBUG = -g $(CFLAGS)
 LIBS = -lcontroller-gadget
 
