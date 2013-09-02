@@ -3,8 +3,8 @@ UDEV_RULE_PATH = /etc/udev/rules.d
 
 default: all
 
-.PHONY: lib cli daemon
-all: kernmodule lib cli daemon
+.PHONY: lib cli daemon firmware
+all: kernmodule lib cli daemon firmware
 
 kernmodule:
 	@make -C /lib/modules/$(shell uname -r)/build M=$(PWD) modules
@@ -18,12 +18,16 @@ cli:
 daemon:
 	@make -C daemon all
 
+firmware:
+	@make -C usbfirmware/USBSprinklerController.X all
+
 
 clean:
 	@make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
 	@make -C lib clean
 	@make -C cli clean
 	@make -C daemon clean
+	@make -C usbfirmware/USBSprinklerController.X all
 
 install:
 	@echo "  INSTALLING controller-gadget-kmod.ko"
