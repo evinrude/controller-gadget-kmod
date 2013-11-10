@@ -115,7 +115,7 @@ static ssize_t sc_write(struct file *file, const char __user *user_buf, size_t c
 static ssize_t sc_read(struct file *file, char __user *user, size_t count, loff_t *ppos);
 
 /**
- * The main data structure used throuough this module
+ * The main data structure for this module
  **/
 struct usb_sc {
 	struct usb_device                      *udev;
