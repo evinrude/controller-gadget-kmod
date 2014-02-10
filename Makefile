@@ -27,7 +27,7 @@ clean:
 	@make -C lib clean
 	@make -C cli clean
 	@make -C daemon clean
-	@make -C usbfirmware/USBSprinklerController.X all
+	@make -C usbfirmware/USBSprinklerController.X clean
 
 install:
 	@echo "  INSTALLING controller-gadget-kmod.ko"
