@@ -18,19 +18,19 @@ PATH_TO_IDE_BIN=/opt/microchip/mplabx/mplab_ide/mplab_ide/modules/../../bin/
 # Adding MPLAB X bin directory to path.
 PATH:=/opt/microchip/mplabx/mplab_ide/mplab_ide/modules/../../bin/:$(PATH)
 # Path to java used to run MPLAB X when this makefile was created
-MP_JAVA_PATH="/opt/microchip/mplabx/sys/java/jre1.7.0_17/bin/"
+MP_JAVA_PATH="/opt/microchip/mplabx/sys/java/jre1.7.0_25/bin/"
 OS_CURRENT="$(shell uname -s)"
-MP_CC="/usr/hitech/picc-18/9.80/bin/picc18"
+MP_CC="/opt/microchip/xc8/v1.31/bin/xc8"
 # MP_CPPC is not defined
 # MP_BC is not defined
-MP_AS="/usr/hitech/picc-18/9.80/bin/picc18"
-MP_LD="/usr/hitech/picc-18/9.80/bin/picc18"
-MP_AR="/usr/hitech/picc-18/9.80/bin/picc18"
+MP_AS="/opt/microchip/xc8/v1.31/bin/xc8"
+# MP_LD is not defined
+# MP_AR is not defined
 DEP_GEN=${MP_JAVA_PATH}java -jar "/opt/microchip/mplabx/mplab_ide/mplab_ide/modules/../../bin/extractobjectdependencies.jar" 
-MP_CC_DIR="/usr/hitech/picc-18/9.80/bin"
+MP_CC_DIR="/opt/microchip/xc8/v1.31/bin"
 # MP_CPPC_DIR is not defined
 # MP_BC_DIR is not defined
-MP_AS_DIR="/usr/hitech/picc-18/9.80/bin"
-MP_LD_DIR="/usr/hitech/picc-18/9.80/bin"
-MP_AR_DIR="/usr/hitech/picc-18/9.80/bin"
+MP_AS_DIR="/opt/microchip/xc8/v1.31/bin"
+# MP_LD_DIR is not defined
+# MP_AR_DIR is not defined
 # MP_BC_DIR is not defined
