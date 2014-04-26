@@ -29,8 +29,7 @@
 #include "sprinklerdaemon.h"
 
 static sprinkler_config_t *myconfig;
-
-void process_config();
+int DRYRUN = 0;
 
 //---------------------------------------------------------
 //
@@ -53,10 +52,43 @@ void sighandler(int signal)
 	}
 }
 
+
+//---------------------------------------------------------
+//
+// Function: 	send_sprinkler_command
+// Description: Wrapper for sendSprinklerZoneCommand
+// Arguments:	int Command
+//
+// Returns:		int
+int send_sprinkler_command(int command)
+{
+	if(DRYRUN) {
+		return EXIT_SUCCESS;
+	} else {
+		return sendSprinklerZoneCommand(command);
+	}
+}
+
+//---------------------------------------------------------
+//
+// Function: 	get_sprinkler_status
+// Description: Wrapper for get_status_response;
+// Arguments:	nothing
+//
+// Returns:		char
+char get_sprinkler_status()
+{
+	if(DRYRUN) {
+		return '0';
+	} else {
+		return get_status_response();
+	}
+}
+
 //---------------------------------------------------------
 //
 // Function:    process_config
-// Description  attempts to proces the configuration file - can be called multiple times, hopefully
+// Description  attempts to process the configuration file - can be called multiple times, hopefully
 // Arguments:   nothing
 //
 // Returns:     nothing
@@ -113,16 +145,16 @@ void check(void)
 	char checkresponse = '0';
 
 	logdebug("======Check======");
-	int retval = sendSprinklerZoneCommand(CMD_STATUS);
+	int retval = send_sprinkler_command(CMD_STATUS);
 	if (retval != 0) {
 		logerror("CMD_STATUS command failed");
 		gadgetrefresh();
 	}else  {
-		checkresponse = get_status_response();
+		checkresponse = get_sprinkler_status();
 		loginfo("Status command result [%c]", checkresponse);
 		if (checkresponse != '0') {
 			loginfo("Sending off command");
-			retval = sendSprinklerZoneCommand(CMD_TOGGLE_ZONEOFF);
+			retval = send_sprinkler_command(CMD_TOGGLE_ZONEOFF);
 			if (retval != 0) {
 				logerror("CMD_TOGGLE_ZONEOFF command failed");
 				/* may need to reboot the system here */
@@ -151,6 +183,9 @@ void cycle(entry_t *entry)
 	time_t counter;
 	time_t end;
 
+	//friendly ascii end time
+	char *ascii_end;
+
 	//track the zone
 	int zone = 0;
 
@@ -160,9 +195,13 @@ void cycle(entry_t *entry)
 
 		switch (zone) {
 		case 1:
+			if (entry->zone1_duration == 0) {
+				loginfo("Skipping zone 1");
+				continue;
+			}
 			end = start + (entry->zone1_duration * 60);
 			loginfo("Cycling zone 1");
-			if ((sendSprinklerZoneCommand(CMD_TOGGLE_ZONE1) == EXIT_SUCCESS)) {
+			if ((send_sprinkler_command(CMD_TOGGLE_ZONE1) == EXIT_SUCCESS)) {
 				loginfo("Commmand was sent successfully");
 			}else  {
 				gadgetrefresh();
@@ -170,9 +209,13 @@ void cycle(entry_t *entry)
 			}
 			break;
 		case 2:
+			if (entry->zone2_duration == 0) {
+				loginfo("Skipping zone 2");
+				continue;
+			}
 			end = start + (entry->zone2_duration * 60);
 			loginfo("Cycling zone 2");
-			if ((sendSprinklerZoneCommand(CMD_TOGGLE_ZONE2) == EXIT_SUCCESS)) {
+			if ((send_sprinkler_command(CMD_TOGGLE_ZONE2) == EXIT_SUCCESS)) {
 				loginfo("Commmand was sent successfully");
 			}else  {
 				gadgetrefresh();
@@ -180,9 +223,13 @@ void cycle(entry_t *entry)
 			}
 			break;
 		case 3:
+			if (entry->zone3_duration == 0) {
+				loginfo("Skipping zone 3");
+				continue;
+			}	
 			end = start + (entry->zone3_duration * 60);
 			loginfo("Cycling zone 3");
-			if ((sendSprinklerZoneCommand(CMD_TOGGLE_ZONE3) == EXIT_SUCCESS)) {
+			if ((send_sprinkler_command(CMD_TOGGLE_ZONE3) == EXIT_SUCCESS)) {
 				loginfo("Commmand was sent successfully");
 			}else  {
 				gadgetrefresh();
@@ -190,18 +237,26 @@ void cycle(entry_t *entry)
 			}
 			break;
 		case 4:
+			if (entry->zone4_duration == 0) {
+				loginfo("Skipping zone 4");
+				continue;
+			}	
 			end = start + (entry->zone4_duration * 60);
 			loginfo("Cycling zone 4");
-			if ((sendSprinklerZoneCommand(CMD_TOGGLE_ZONE4) == EXIT_SUCCESS)) {
+			if ((send_sprinkler_command(CMD_TOGGLE_ZONE4) == EXIT_SUCCESS)) {
 				loginfo("Commmand was sent successfully");
 			}else  {
 				logerror("Received bad status from controller");
 			}
 			break;
 		case 5:
+			if (entry->zone5_duration == 0) {
+				loginfo("Skipping zone 5");
+				continue;
+			}	
 			end = start + (entry->zone5_duration * 60);
 			loginfo("Cycling zone 5");
-			if ((sendSprinklerZoneCommand(CMD_TOGGLE_ZONE5) == EXIT_SUCCESS)) {
+			if ((send_sprinkler_command(CMD_TOGGLE_ZONE5) == EXIT_SUCCESS)) {
 				loginfo("Commmand was sent successfully");
 			}else  {
 				gadgetrefresh();
@@ -209,9 +264,13 @@ void cycle(entry_t *entry)
 			}
 			break;
 		case 6:
+			if (entry->zone6_duration == 0) {
+				loginfo("Skipping zone 6");
+				continue;
+			}
 			end = start + (entry->zone6_duration * 60);
 			loginfo("Cycling zone 6");
-			if ((sendSprinklerZoneCommand(CMD_TOGGLE_ZONE6) == EXIT_SUCCESS)) {
+			if ((send_sprinkler_command(CMD_TOGGLE_ZONE6) == EXIT_SUCCESS)) {
 				loginfo("Commmand was sent successfully");
 			}else  {
 				gadgetrefresh();
@@ -220,6 +279,9 @@ void cycle(entry_t *entry)
 			break;
 		}
 
+		ascii_end = asctime(localtime(&end));
+		ascii_end[strlen(ascii_end)-1] = '\0';
+		logdebug("Zone cycling will complete on %s", ascii_end);
 		while ((counter = time(NULL)) < end) {
 			//sleep until finished
 			sleep(10);
@@ -228,7 +290,7 @@ void cycle(entry_t *entry)
 
 	//turn them off
 	loginfo("Sending off command");
-	if ((sendSprinklerZoneCommand(CMD_TOGGLE_ZONE6) == EXIT_SUCCESS)) {
+	if ((send_sprinkler_command(CMD_TOGGLE_ZONE6) == EXIT_SUCCESS)) {
 			loginfo("Command OFF was sent successfully, cycle finished");
 	}else {
 		gadgetrefresh();
@@ -307,11 +369,13 @@ int daemonize(void)
 //---------------------------------------------------------
 void usage(void)
 {
+	//-a = dryrun
 	//-o = stdout
 	//-d = debug
 	//-f = facility [1-7]
 	//-c = configuration file
-	fprintf(stderr, "sprinklerdaemon [-o] [-d] [-f [1-9]] [-c file]\n");
+	fprintf(stderr, "sprinklerdaemon [-a] [-o] [-d] [-f [1-9]] [-c file]\n");
+	fprintf(stderr, "-a\tdry run sprinkler zones (will not fire)\n");
 	fprintf(stderr, "-o\tprint to stdout (will not fork)\n");
 	fprintf(stderr, "-d\tdebug\n");
 	fprintf(stderr, "-f\tsyslog facility 1-9\n");
@@ -430,8 +494,10 @@ int main(int argc, char **argv)
 	//-f = facility [1-7]
 	//-c = configuration file
 	int c;
-	while ((c = getopt(argc, argv, "odf:c:")) != -1) {
+	while ((c = getopt(argc, argv, "aodf:c:")) != -1) {
 		switch (c) {
+		case 'a':
+			DRYRUN = 1;
 		case 'o':
 			mode = S_LOGGER_MODE_STDOUT;
 			break;

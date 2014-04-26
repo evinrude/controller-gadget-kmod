@@ -24,7 +24,7 @@
 
 #define MAXLINE 128
 #define MAXDURATION 30
-#define MINDURATION 2
+#define MINDURATION 0
 #define ASCII_NEWLINE 0x0a
 #define ASCII_SPACE 0x20
 #define ASCII_COMMENT 0x023
