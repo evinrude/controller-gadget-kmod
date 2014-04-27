@@ -24,7 +24,7 @@
 
 #define MAXLINE 128
 #define MAXDURATION 30
-#define MINDURATION 2
+#define MINDURATION 0
 #define ASCII_NEWLINE 0x0a
 #define ASCII_SPACE 0x20
 #define ASCII_COMMENT 0x023
@@ -79,6 +79,7 @@ typedef struct
 typedef struct
 {
 	int periodic_check;     //how often to check the sprinkler system for status in seconds
+	int inert;		//Specifies if the daemon should be inert (i.e. do not fire zones)
 	char *conf;             //configuration file
 	FILE *conffd;           //configuration file handle
 

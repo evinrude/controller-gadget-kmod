@@ -24,10 +24,13 @@
 #include "sprinkler-config.h"
 #include "sprinkler-logger.h"
 
+void process_config();
 void cycle(entry_t *entry);
 void check(void);
 void usage(void);
 int daemonize(void);
 void main_loop(sprinkler_config_t *config);
 void sighandler(int signal);
+int send_sprinkler_command(int command);
+char get_sprinkler_status();
 #endif
