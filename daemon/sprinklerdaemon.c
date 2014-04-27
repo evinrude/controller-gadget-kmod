@@ -295,7 +295,7 @@ void cycle(entry_t *entry)
 
 	//turn them off
 	loginfo("Sending off command");
-	if ((send_sprinkler_command(CMD_TOGGLE_ZONE6) == EXIT_SUCCESS)) {
+	if ((send_sprinkler_command(CMD_TOGGLE_ZONEOFF) == EXIT_SUCCESS)) {
 			loginfo("Command OFF was sent successfully, cycle finished");
 	}else {
 		gadgetrefresh();
