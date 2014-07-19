@@ -396,6 +396,26 @@ int load_config(sprinkler_config_t *config)
 
 }
 
+//---------------------------------------------------------
+// Function:    free_config
+// Description  frees all memory malloc'd from init_config
+// Arguments:   sprinkler_config_t
+//
+// Returns:     void
+//---------------------------------------------------------
+void free_config(sprinkler_config_t *config)
+{
+	free(config->app_config);
+	free(config->monday);
+	free(config->tuesday);
+	free(config->wednesday);
+	free(config->thursday);
+	free(config->friday);
+	free(config->saturday);
+	free(config->sunday);
+
+	return;
+}
 
 //---------------------------------------------------------
 // Function:    init_config

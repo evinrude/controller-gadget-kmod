@@ -114,6 +114,7 @@ typedef struct
 
 } sprinkler_config_t;
 
+void free_config(sprinkler_config_t *config);
 int init_config(sprinkler_config_t *config);
 int load_config(sprinkler_config_t *config);
 int split_line(char *line, kv_t *kv);

@@ -44,6 +44,8 @@ void sighandler(int signal)
 	if (signal == SIGTERM) {
 		loginfo("Received SIGTERM - cleaning up");
 		check();
+		free_config(myconfig);
+		free(myconfig);
 		exit(0);
 	} else if (signal == SIGHUP) {
 		loginfo("Received SIGHUP - re-reading configuration file [%s]", myconfig->app_config->conf);
@@ -51,6 +53,8 @@ void sighandler(int signal)
 	} else if (signal == SIGINT) {
 		loginfo("Received SIGINT - cleaning up");
 		check();
+		free_config(myconfig);
+		free(myconfig);
 		exit(0);
 	}
 }
